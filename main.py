@@ -16,6 +16,7 @@ import webapp2
 from bs4 import BeautifulSoup
 from google.appengine.api import urlfetch
 import json
+import parse_result
 
 
 def parse(doc):
@@ -46,6 +47,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('Unofficial ctengg API website.')
 
 
+
 class Attendance(webapp2.RequestHandler):
     def get(self, fac_no):
         doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table.php?id='+fac_no)
@@ -62,7 +64,15 @@ class Attendance(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json_out)
 
+
+class Result(webapp2.RequestHandler):
+    def get(self,fac_no, enrol_no):
+        data = parse_result.parse_result(parse_result.page)
+        json_out = json.dumps(data, ensure_ascii=False, indent=2)
+        self.response.out.write(json_out)
+
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=MainPage, name='home'),
     webapp2.Route(r'/attendance/<fac_no>', handler=Attendance, name='attendance'),
+    webapp2.Route(r'/result/<fac_no>&<enrol_no>', handler = Result, name = 'result')
 ])
