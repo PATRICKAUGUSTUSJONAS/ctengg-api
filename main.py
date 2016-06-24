@@ -67,9 +67,18 @@ class Attendance(webapp2.RequestHandler):
 
 class Result(webapp2.RequestHandler):
     def get(self,fac_no, enrol_no):
-        data = parse_result.parse_result(parse_result.page)
+        doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table_result.php?'+'fac='+fac_no.upper()+'&en='+enrol_no.upper()+'&prog=btech')
+
+        try:
+            data = parse_result.parse_result(doc.content)
+            data['error'] = False
+        except AttributeError as e:
+            data = dict()
+            data['error'] = True
         json_out = json.dumps(data, ensure_ascii=False, indent=2)
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json_out)
+        
 
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=MainPage, name='home'),
