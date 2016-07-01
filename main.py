@@ -41,13 +41,6 @@ def parse(doc):
     return datasets
 
 
-class MainPage(webapp2.RequestHandler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('Unofficial ctengg API website.')
-
-
-
 class Attendance(webapp2.RequestHandler):
     def get(self, fac_no):
         doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table.php?id='+fac_no)
@@ -89,8 +82,14 @@ class Result(webapp2.RequestHandler):
         self.response.out.write(json_out)
         
 
+class IndexHandler(webapp2.RequestHandler):
+	def get(self):
+		self.redirect('static/index.html')
+		
+
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/', handler=MainPage, name='home'),
+    webapp2.Route(r'/', handler=IndexHandler, name='home'),
+    webapp2.Route(r'/index.html', handler=IndexHandler, name='home'),
     webapp2.Route(r'/attendance/<fac_no>', handler=Attendance, name='attendance'),
     webapp2.Route(r'/result/btech/', handler = Result, name = 'result')
 ])
