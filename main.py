@@ -66,15 +66,24 @@ class Attendance(webapp2.RequestHandler):
 
 
 class Result(webapp2.RequestHandler):
-    def get(self,fac_no, enrol_no):
-        doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table_result.php?'+'fac='+fac_no.upper()+'&en='+enrol_no.upper()+'&prog=btech')
+    def get(self):
+    	fac_no = self.request.get("fac")
+    	en_no  = self.request.get("en")
 
-        try:
-            data = parse_result.parse_result(doc.content)
-            data['error'] = False
-        except AttributeError as e:
-            data = dict()
-            data['error'] = True
+    	data = dict()
+    	data['error'] = False
+
+    	if fac_no and en_no :
+    		doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table_result.php?'+'fac='+fac_no+'&en='+en_no+'&prog=btech')
+
+    		try:
+    			data = parse_result.parse_result(doc.content)
+    		except AttributeError as e:
+    			data = dict()
+    			data['error'] = True
+    	else :
+    		data['error'] = True
+
         json_out = json.dumps(data, ensure_ascii=False, indent=2)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json_out)
@@ -83,5 +92,5 @@ class Result(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=MainPage, name='home'),
     webapp2.Route(r'/attendance/<fac_no>', handler=Attendance, name='attendance'),
-    webapp2.Route(r'/result/<fac_no>&<enrol_no>', handler = Result, name = 'result')
+    webapp2.Route(r'/result/btech/', handler = Result, name = 'result')
 ])
