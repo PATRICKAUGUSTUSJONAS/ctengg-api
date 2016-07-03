@@ -91,5 +91,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=IndexHandler, name='home'),
     webapp2.Route(r'/index.html', handler=IndexHandler, name='home'),
     webapp2.Route(r'/attendance/<fac_no>', handler=Attendance, name='attendance'),
-    webapp2.Route(r'/result/btech/', handler = Result, name = 'result')
+    webapp2.Route(r'/result/btech', handler = Result, name = 'result')
 ])
