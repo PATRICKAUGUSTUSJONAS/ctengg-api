@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 17.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+<g id="angle">
+	<rect x="50" y="48.859" fill="#CCCCCC" width="27" height="2"/>
+	<circle fill="#A5A08B" cx="48.69" cy="49.802" r="3"/>
+	<polygon fill="#A5A08B" points="59,21.083 74.792,49.875 58.917,77 67,77 82,49.333 66,21.167 	"/>
+</g>
+<g>
+	
+		<image overflow="visible" opacity="0.22" width="372" height="337" xlink:href="D02B180A.png"  transform="matrix(0.24 0 0 0.24 4.2623 10)">
+	</image>
+	<g>
+		<path fill="#808080" d="M64.685,22l15.808,27.333L64.685,76.667H33.07L17.262,49.333L33.07,22H64.685 M64.685,12H33.07
+			c-3.57,0-6.869,1.903-8.657,4.994L8.606,44.327c-1.791,3.097-1.791,6.915,0,10.013l15.808,27.333
+			c1.787,3.09,5.087,4.994,8.657,4.994h31.615c3.57,0,6.869-1.903,8.657-4.994L89.149,54.34c1.791-3.097,1.791-6.915,0-10.013
+			L73.341,16.994C71.554,13.903,68.255,12,64.685,12L64.685,12z"/>
+	</g>
+</g>
+<g id="bolts" opacity="0.6">
+	
+		<image overflow="visible" opacity="0.22" width="356" height="323" xlink:href="D02B180B.png"  transform="matrix(0.24 0 0 0.24 6.1667 11.5833)">
+	</image>
+	<g>
+		<g>
+			<circle fill="#FFFFFF" cx="49.114" cy="17" r="3.417"/>
+			<circle fill="#FFFFFF" cx="67.208" cy="17.75" r="3.417"/>
+			<circle fill="#FFFFFF" cx="31.167" cy="17.75" r="3.417"/>
+			<circle fill="#FFFFFF" cx="49.114" cy="81.529" r="3.417"/>
+			<circle fill="#FFFFFF" cx="67.125" cy="81.167" r="3.417"/>
+			<circle fill="#FFFFFF" cx="31.083" cy="81.167" r="3.417"/>
+			<circle fill="#FFFFFF" cx="20.979" cy="32.729" r="3.417"/>
+			<circle fill="#FFFFFF" cx="12.583" cy="49.292" r="3.417"/>
+			<circle fill="#FFFFFF" cx="20.999" cy="65.916" r="3.417"/>
+			<circle fill="#FFFFFF" cx="76.715" cy="32.44" r="3.417"/>
+			<circle fill="#FFFFFF" cx="85.111" cy="49.003" r="3.417"/>
+			<circle fill="#FFFFFF" cx="76.695" cy="65.627" r="3.417"/>
+		</g>
+	</g>
+</g>
+</svg>
