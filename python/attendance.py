@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-import json
 
 def parse(doc):
     table = BeautifulSoup(doc, "html.parser")
