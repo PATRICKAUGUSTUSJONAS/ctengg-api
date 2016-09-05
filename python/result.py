@@ -1,7 +1,4 @@
 from bs4 import BeautifulSoup
-import urllib
-import json
-
 
 def parse_result(page):
     table = BeautifulSoup(page, "html.parser")
