@@ -1,1 +1,6 @@
-.pyc
+*.pyc
+.idea/
+python/*.pyc
+handlers/*.pyc
+*.orig
+.*.orig
