@@ -3,6 +3,14 @@ body {
 	margin: 0;
 }
 
+#logo {
+	position: fixed;
+	top: 0;
+	float: left;
+	width: 80px;
+	margin-left: 20px;
+}
+
 footer {
 	position: fixed;
 	bottom:0;
@@ -14,27 +22,17 @@ footer {
 	background: #f44336;
 	padding: 10px;
 }
-header {
+
+.header {
 	position: fixed;
 	top: 0;
 	width: 100%;
-	top: 0;
-	left: 0;
-	background-color: #fff;
-	padding: 15px 20px 20px 20px;
-	box-shadow: 0 5px 15px rgba(0,0,0,0.10), 0 5px 5px rgba(0,0,0,0.10);
-}
-header img#logo{
-	display: inline-block;
-	height: 80px;
-	float:left;
-}
-header h1#appTitle{
-	display: inline-block;
-	font-family: 'Arvo',serif;
+	font-family: 'Arvo', serif;
 	font-weight: 400;
 	font-size: 14;
+	background: #fff;
 	color: #555;
-	float:left;
-
+	margin-top: 0;
+	padding: 20px 0px 20px 120px;
+	box-shadow: 0 5px 15px rgba(0,0,0,0.10), 0 5px 5px rgba(0,0,0,0.10);
 }
