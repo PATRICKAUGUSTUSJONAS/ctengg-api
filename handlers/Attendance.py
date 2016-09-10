@@ -2,15 +2,15 @@ from google.appengine.api import urlfetch
 import json
 from python.attendance import parse
 import webapp2
-from python.database import Database
+from python.database import User
 from google.appengine.ext import db
 
 class Attendance(webapp2.RequestHandler):
     def get(self, fac_no):
         api_key = self.request.get("api")
-        datas = db.GqlQuery("SELECT * FROM Database")
+        datas = db.GqlQuery("SELECT * FROM User")
         for data in datas:
-            if api_key and data.key_api == api_key:
+            if api_key and data.api_key == api_key:
                 doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table.php?id='+fac_no)
 
                 try:
