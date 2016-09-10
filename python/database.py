@@ -1,10 +1,9 @@
 from google.appengine.ext import db
 
-class Database(db.Model):
+class User(db.Model):
 	username = db.StringProperty(required = True)
-	faculty = db.StringProperty(required = True)
+	faculty_no = db.StringProperty(required = True)
 	email  =db.EmailProperty(required = True)
-	key_api = db.StringProperty(required = True)
-	admin = db.IntegerProperty()
-	banned = db.IntegerProperty()
-
+	api_key = db.StringProperty(required = True)
+	admin = db.BooleanProperty()
+	banned = db.BooleanProperty()
