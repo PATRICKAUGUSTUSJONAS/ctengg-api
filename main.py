@@ -16,8 +16,12 @@ import webapp2
 from handlers.MainPage import MainPage
 from handlers.Result import Result
 from handlers.Attendance import Attendance
+from handlers.CompleteAttendance import CompleteAttendance
+from handlers.CompleteAttendance import ClassAttendance
 
 
 app = webapp2.WSGIApplication([ webapp2.Route(r'/', handler=MainPage, name='home'),
-								webapp2.Route(r'/result/', handler = Result, name = 'result'),
-								webapp2.Route(r'/attendance/<fac_no>', handler=Attendance, name='attendance')])
+								webapp2.Route(r'/result/btech', handler = Result, name = 'result'),
+								webapp2.Route(r'/attendance/<fac_no>', handler=Attendance, name='attendance'),
+								webapp2.Route(r'/complete_attendance', handler=CompleteAttendance, name='complete_attendance'),
+								webapp2.Route(r'/complete_attendance/<course>', handler=ClassAttendance, name='complete_attendance')])
