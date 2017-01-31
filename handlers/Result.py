@@ -2,20 +2,27 @@ import json
 import webapp2
 from bs4 import BeautifulSoup
 from db.models import User
+from db.models import RequestLog
+from db.models import CacheData
 from google.appengine.ext import db
 from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
 class Result(webapp2.RequestHandler):
 
-    def parse_result(self, page):
+    @staticmethod
+    def parse_result(page):
         table = BeautifulSoup(page, "html.parser")
         keys = ['course',
+                'course_name',
                 'sessional_marks',
                 'exam_marks',
                 'total',
+                'highest',
+                'class_average',
                 'grace',
-                'grades']
+                'grades',
+                'subject_rank']
 
 
         credit_keys = ['faculty_number', 'enrolment', 'name', 'ec', 'spi', 'cpi']
@@ -35,24 +42,57 @@ class Result(webapp2.RequestHandler):
         
         return dataset
 
-    def get_result(self, fac_no, enrol_no, user):
-        key = 'result_'+fac_no.upper()
-        data = memcache.get(key)
-
-        if data is None:
-            doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table_result.php?'+'fac='+fac_no+'&en='+enrol_no+'&prog=btech')
-            try:
-                data = self.parse_result(doc.content)
-                data['error'] = False
-                data['message'] = 'Successful'
-            except AttributeError as e:
-                data = dict()
-                data['error'] = True
-                data['message'] = 'Parse Error'
-            data['user'] = user.username
-            memcache.set(key, data, 1209600)
+    @staticmethod
+    def get_result_by_fetch(fac_no, enrol_no):
+        doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table_resultnew.php?'+'fac='+fac_no+'&en='+enrol_no+'&prog=btech')
+        try:
+            data = Result.parse_result(doc.content)
+            data['error'] = False
+            data['message'] = 'Successful'
+        except AttributeError as e:
+            data = dict()
+            data['error'] = True
+            data['message'] = 'Parse Error'
 
         return data
+
+    @staticmethod
+    def get_result(fac_no, enrol_no, user, use_stored = True):
+        key = 'result_'+fac_no.upper()+':'+enrol_no.upper()
+        data = memcache.get(key)
+
+        if data is None or not use_stored:
+            store_data = CacheData.get_by_id(key)
+            if store_data is None or not use_stored:
+                data = Result.get_result_by_fetch(fac_no, enrol_no)
+                store_data = CacheData(id = key)
+                store_data.request = key
+                store_data.data = json.dumps(data)
+                store_data.put()
+            else:
+                data = json.loads(store_data.data)
+            data['user'] = user.username
+            memcache.set(key, data)
+
+        return data
+
+    @staticmethod
+    def log(fac_no, enrol_no):
+        fac_no = fac_no.upper()
+        enrol_no = enrol_no.upper()
+        key = fac_no+':'+enrol_no
+        request_log = RequestLog.get_by_id(key)
+        if request_log is None:
+            request_log = RequestLog(id = key)
+            request_log.attendance = False
+            request_log.requests = request_log.requests + 1
+            request_log.data = key
+            request_log.put()
+        else:
+            request_log.attendance = False
+            request_log.data = key
+            request_log.requests = request_log.requests + 1
+            request_log.put()
 
     def get(self):
         api_key = self.request.get('api_key')
@@ -63,7 +103,8 @@ class Result(webapp2.RequestHandler):
         if api_key and fac_no and enrol_no:
             user = User.get_user(api_key)
             if user and not user.banned : 
-                data = self.get_result(fac_no, enrol_no, user)
+                data = Result.get_result(fac_no, enrol_no, user)
+                #Result.log(fac_no, enrol_no)
             elif user and user.banned :
                 data = {'error':True, 'message':'API key is banned or not activated yet'}
             else :

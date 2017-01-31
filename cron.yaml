@@ -1,0 +1,4 @@
+cron:
+- description: daily summary job
+  url: /cache_warmer?api_key=RqCWSXVu4SsaVsDngUoXkZszXgwCpbHJThO9rMbn
+  schedule: every 20 minutes

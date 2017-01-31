@@ -4,6 +4,7 @@ import webapp2
 import datetime
 from bs4 import BeautifulSoup
 from db.models import User
+from db.models import CacheData
 from xlrd import XLRDError
 from google.appengine.ext import db
 from google.appengine.api import urlfetch
@@ -11,7 +12,8 @@ from google.appengine.api import memcache
 
 class ClassAttendance(webapp2.RequestHandler):
 
-    def parse_course(self, excel):
+    @staticmethod
+    def parse_course(excel):
         book = xlrd.open_workbook(file_contents=excel)
         sheet = book.sheet_by_index(0)
         datasets = dict()
@@ -43,26 +45,40 @@ class ClassAttendance(webapp2.RequestHandler):
 
         return datasets
 
-    def get_attendance(self, course, user):
-        key = 'course_'+course
+    @staticmethod
+    def get_attendance_by_fetch(course):
+        doc = urlfetch.fetch('http://ctengg.amu.ac.in/attendance/btech//'+course+'.XLSX')
+        if '404' in doc.content :
+            doc = urlfetch.fetch('http://ctengg.amu.ac.in/attendance/btech//'+course+'.XLS')
+
+        try:
+            data = ClassAttendance.parse_course(doc.content)
+            data['error'] = False
+            data['message'] = 'Successful'
+        except XLRDError as e:
+            data = dict()
+            data['error'] = True
+            data['message'] = 'Invalid Course'
+
+        return data
+
+    @staticmethod
+    def get_attendance(course, user, use_stored = True):
+        key = 'course_'+ course
         data = memcache.get(key)
 
-        if data is None:
-            doc = urlfetch.fetch('http://ctengg.amu.ac.in/attendance/btech//'+course+'.XLSX')
-            if '404' in doc.content :
-                doc = urlfetch.fetch('http://ctengg.amu.ac.in/attendance/btech//'+course+'.XLS')
-
-            try:
-                data = self.parse_course(doc.content)
-                data['error'] = False
-                data['message'] = 'Successful'
-            except XLRDError as e:
-                data = dict()
-                data['error'] = True
-                data['message'] = 'Invalid Course'
-
+        if data is None or not use_stored:
+            store_data = CacheData.get_by_id(key)
+            if store_data is None or not use_stored:
+                data = ClassAttendance.get_attendance_by_fetch(course)
+                store_data = CacheData(id = key)
+                store_data.request = key
+                store_data.data = json.dumps(data)
+                store_data.put()
+            else:
+                data = json.loads(store_data.data)
             data['user'] = user.username
-            memcache.set(key, data, 1209600)
+            memcache.set(key, data)
 
         return data
 
@@ -73,7 +89,7 @@ class ClassAttendance(webapp2.RequestHandler):
         if api_key:
             user = User.get_user(api_key)
             if user and not user.banned : 
-                data = self.get_attendance(course, user)
+                data = ClassAttendance.get_attendance(course, user)
             elif user and user.banned :
                 data = {'error':True, 'message':'API key is banned or not activated yet'}
             else :
@@ -85,7 +101,8 @@ class ClassAttendance(webapp2.RequestHandler):
 
 class CompleteAttendance(webapp2.RequestHandler):
 
-    def parse(self, doc):
+    @staticmethod
+    def parse(doc):
         table = BeautifulSoup(doc, "html.parser")
 
         keys = ['course', 'teacher', 'date_of_upload', 'course', 'teacher', 'date_of_upload', 'course', 'teacher', 'date_of_upload']
@@ -99,24 +116,38 @@ class CompleteAttendance(webapp2.RequestHandler):
 
         return datasets
 
-    def get_attendance(self, user):
+    @staticmethod
+    def get_attendance_by_fetch():
+        doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/cattendance.php?p=btech')
+
+        try:
+            data = CompleteAttendance.parse(doc.content)
+            data['error'] = False
+            data['message'] = 'Successful'
+        except AttributeError as e:
+            data = dict()
+            data['error'] = True
+            data['message'] = 'Parse Error'
+
+        return data
+
+    @staticmethod
+    def get_attendance(user, use_stored = True):
         key = 'complete_attendance'
         data = memcache.get(key)
 
-        if data is None:
-            doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/cattendance.php?p=btech')
-
-            try:
-                data = self.parse(doc.content)
-                data['error'] = False
-                data['message'] = 'Successful'
-            except AttributeError as e:
-                data = dict()
-                data['error'] = True
-                data['message'] = 'Parse Error'
-
+        if data is None or not use_stored:
+            store_data = CacheData.get_by_id(key)
+            if store_data is None or use_stored:
+                data = CompleteAttendance.get_attendance_by_fetch()
+                store_data = CacheData(id = key)
+                store_data.request = key
+                store_data.data = json.dumps(data)
+                store_data.put()
+            else:
+                data = json.loads(store_data.data)
             data['user'] = user.username
-            memcache.set(key, data, 86400)
+            memcache.set(key, data)
 
         return data
 
@@ -126,7 +157,7 @@ class CompleteAttendance(webapp2.RequestHandler):
         if api_key:
             user = User.get_user(api_key)
             if user and not user.banned : 
-                data = self.get_attendance(user)
+                data = CompleteAttendance.get_attendance(user)
             elif user and user.banned :
                 data = {'error':True, 'message':'API key is banned or not activated yet'}
             else :
