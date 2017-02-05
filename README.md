@@ -1,4 +1,8 @@
 # ctengg-api
+[![Codacy grade](https://img.shields.io/codacy/grade/19e342e095b74db1a35f18d8ae6f34cc.svg)]()
+[![Website](https://img.shields.io/website-up-down-green-red/http/ctengg.amu.ac.in.svg)]()
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+
 Unofficial REST API for ctengg.amu.ac.in
 
 ## Endpoints
