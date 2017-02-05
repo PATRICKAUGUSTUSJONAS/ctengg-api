@@ -5,3 +5,4 @@ python/*.pyc
 handlers/*.pyc
 *.orig
 .*.orig
+lib/
