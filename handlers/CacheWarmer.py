@@ -2,7 +2,6 @@ import time
 
 import webapp2
 
-from db.models import User
 from utils import *
 
 
@@ -31,10 +30,10 @@ class CacheWarmer(webapp2.RequestHandler):
                 get_result(fac, en, user, cache_enabled)
                 data['result'] += 1
             elif 'course_' in request:
-                get_attendance(CacheWarmer.substring(request, 'course_'), user, cache_enabled)
+                get_course_attendance(CacheWarmer.substring(request, 'course_'), user, cache_enabled)
                 data['course'] += 1
             elif 'complete_' in request:
-                get_attendance(user, cache_enabled)
+                get_complete_attendance(user, cache_enabled)
                 data['complete'] += 1
 
         return data
@@ -42,18 +41,11 @@ class CacheWarmer(webapp2.RequestHandler):
     def get(self):
         start = time.time()
         api_key = self.request.get("api_key")
-        data = dict()
-        if api_key:
-            user = User.get_user(api_key)
-            if user and not user.banned:
-                cached = False
-                if self.request.get('cached'):
-                    cached = True
-                data = CacheWarmer.warm_cache(user, cached)
-            elif user and user.banned:
-                data = {'error': True, 'message': 'API key is banned or not activated yet'}
-            else:
-                data = {'error': True, 'message': 'No such API key in database'}
+
+        data = verify_api_key(api_key)
+        if not data['error']:
+            cached = self.request.get('cached')
+            data = CacheWarmer.warm_cache(data.pop('user'), cached)
 
         data['time'] = time.time() - start
         json_out = json.dumps(data, ensure_ascii=False, indent=2)

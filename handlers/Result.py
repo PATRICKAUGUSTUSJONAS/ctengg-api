@@ -1,8 +1,6 @@
 import webapp2
 from bs4 import BeautifulSoup
-from google.appengine.api import urlfetch
 
-from db.models import User
 from utils import *
 
 
@@ -37,40 +35,19 @@ class Result(webapp2.RequestHandler):
 
         return dataset
 
-    @staticmethod
-    def get_result_by_fetch(fac_no, enrol_no):
-        doc = urlfetch.fetch(
-            'http://ctengg.amu.ac.in/web/table_resultnew.php?' + 'fac=' + fac_no + '&en=' + enrol_no + '&prog=btech')
-
-        data = verify_page(doc.content)
-        if data['error']:
-            return data
-
-        try:
-            data = Result.parse_result(doc.content)
-            data['error'] = False
-            data['message'] = 'Successful'
-        except AttributeError:
-            data['error'] = True
-            data['message'] = 'Parse Error'
-
-        return data
-
     def get(self):
         api_key = self.request.get('api_key')
         fac_no = self.request.get('fac')
         enrol_no = self.request.get('en')
 
-        data = {'error': True,
-                'message': "URL must contain API Key : 'api_key', Faculty Number : 'fac' and Enrolment No : 'en'"}
-        if api_key and fac_no and enrol_no:
-            user = User.get_user(api_key)
-            if user and not user.banned:
+        data = verify_api_key(api_key)
+        if not data['error']:
+            user = data.pop('user')
+            data = {'error': True,
+                    'message': "URL must contain Faculty Number : 'fac' and Enrolment No : 'en'",
+                    'user': user.username}
+            if fac_no and enrol_no:
                 data = get_result(fac_no, enrol_no, user)
-            elif user and user.banned:
-                data = {'error': True, 'message': 'API key is banned or not activated yet'}
-            else:
-                data = {'error': True, 'message': 'No such API key in database'}
 
         json_out = json.dumps(data, ensure_ascii=False, indent=2)
         self.response.headers['Content-Type'] = 'application/json'
