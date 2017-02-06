@@ -1,15 +1,13 @@
 import datetime
-import json
 
 import webapp2
 import xlrd
 from bs4 import BeautifulSoup
-from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 from xlrd import XLRDError
 
-from db.models import CacheData
 from db.models import User
+from utils import *
 
 
 class ClassAttendance(webapp2.RequestHandler):
@@ -65,26 +63,6 @@ class ClassAttendance(webapp2.RequestHandler):
 
         return data
 
-    @staticmethod
-    def get_attendance(course, user, use_stored=True):
-        key = 'course_' + course
-        data = memcache.get(key)
-
-        if data is None or not use_stored:
-            store_data = CacheData.get_by_id(key)
-            if store_data is None or not use_stored:
-                data = ClassAttendance.get_attendance_by_fetch(course)
-                store_data = CacheData(id=key)
-                store_data.request = key
-                store_data.data = json.dumps(data)
-                store_data.put()
-            else:
-                data = json.loads(store_data.data)
-            data['user'] = user.username
-            memcache.set(key, data)
-
-        return data
-
     def get(self, course):
         course = course.upper()
         api_key = self.request.get("api_key")
@@ -92,7 +70,7 @@ class ClassAttendance(webapp2.RequestHandler):
         if api_key:
             user = User.get_user(api_key)
             if user and not user.banned:
-                data = ClassAttendance.get_attendance(course, user)
+                data = get_course_attendance(course, user)
             elif user and user.banned:
                 data = {'error': True, 'message': 'API key is banned or not activated yet'}
             else:
@@ -135,33 +113,13 @@ class CompleteAttendance(webapp2.RequestHandler):
 
         return data
 
-    @staticmethod
-    def get_attendance(user, use_stored=True):
-        key = 'complete_attendance'
-        data = memcache.get(key)
-
-        if data is None or not use_stored:
-            store_data = CacheData.get_by_id(key)
-            if store_data is None or use_stored:
-                data = CompleteAttendance.get_attendance_by_fetch()
-                store_data = CacheData(id=key)
-                store_data.request = key
-                store_data.data = json.dumps(data)
-                store_data.put()
-            else:
-                data = json.loads(store_data.data)
-            data['user'] = user.username
-            memcache.set(key, data)
-
-        return data
-
     def get(self):
         api_key = self.request.get("api_key")
         data = {'error': True, 'message': "URL must contain API Key : 'api_key'"}
         if api_key:
             user = User.get_user(api_key)
             if user and not user.banned:
-                data = CompleteAttendance.get_attendance(user)
+                data = get_complete_attendance(user)
             elif user and user.banned:
                 data = {'error': True, 'message': 'API key is banned or not activated yet'}
             else:

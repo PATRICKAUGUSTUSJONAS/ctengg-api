@@ -1,15 +1,13 @@
-import json
-
 import webapp2
 from bs4 import BeautifulSoup
-from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
-from db.models import CacheData
 from db.models import User
+from utils import *
 
 
 class Attendance(webapp2.RequestHandler):
+
     @staticmethod
     def parse_attendance(doc):
         table = BeautifulSoup(doc, "html.parser")
@@ -35,35 +33,18 @@ class Attendance(webapp2.RequestHandler):
     @staticmethod
     def get_attendance_by_fetch(fac_no):
         doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table.php?id=' + fac_no)
+
+        data = verify_page(doc.content)
+        if data['error']:
+            return data
+
         try:
             data = Attendance.parse_attendance(doc.content)
             data['error'] = False
             data['message'] = 'Successful'
         except AttributeError:
-            data = dict()
             data['error'] = True
             data['message'] = 'Parse Error'
-
-        return data
-
-    @staticmethod
-    def get_attendance(fac_no, user, use_stored=True):
-        key = 'attendance_' + fac_no.upper()
-        data = memcache.get(key)
-
-        if data is None or not use_stored:
-            store_data = CacheData.get_by_id(key)
-            if store_data is None or not use_stored:
-                data = Attendance.get_attendance_by_fetch(fac_no)
-                store_data = CacheData(id=key)
-                store_data.request = key
-                store_data.data = json.dumps(data)
-                store_data.put()
-            else:
-                data = json.loads(store_data.data)
-            data['fac'] = fac_no.upper()
-            data['user'] = user.username
-            memcache.set(key, data)
 
         return data
 
@@ -74,8 +55,7 @@ class Attendance(webapp2.RequestHandler):
         if api_key:
             user = User.get_user(api_key)
             if user and not user.banned:
-                data = Attendance.get_attendance(fac_no, user)
-                # Attendance.log(fac_no)
+                data = get_attendance(fac_no, user)
             elif user and user.banned:
                 data = {'error': True, 'message': 'API key is banned or not activated yet'}
             else:

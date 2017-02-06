@@ -1,12 +1,9 @@
-import json
-
 import webapp2
 from bs4 import BeautifulSoup
-from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
-from db.models import CacheData
 from db.models import User
+from utils import *
 
 
 class Result(webapp2.RequestHandler):
@@ -55,26 +52,6 @@ class Result(webapp2.RequestHandler):
 
         return data
 
-    @staticmethod
-    def get_result(fac_no, enrol_no, user, use_stored=True):
-        key = 'result_' + fac_no.upper() + ':' + enrol_no.upper()
-        data = memcache.get(key)
-
-        if data is None or not use_stored:
-            store_data = CacheData.get_by_id(key)
-            if store_data is None or not use_stored:
-                data = Result.get_result_by_fetch(fac_no, enrol_no)
-                store_data = CacheData(id=key)
-                store_data.request = key
-                store_data.data = json.dumps(data)
-                store_data.put()
-            else:
-                data = json.loads(store_data.data)
-            data['user'] = user.username
-            memcache.set(key, data)
-
-        return data
-
     def get(self):
         api_key = self.request.get('api_key')
         fac_no = self.request.get('fac')
@@ -85,7 +62,7 @@ class Result(webapp2.RequestHandler):
         if api_key and fac_no and enrol_no:
             user = User.get_user(api_key)
             if user and not user.banned:
-                data = Result.get_result(fac_no, enrol_no, user)
+                data = get_result(fac_no, enrol_no, user)
             elif user and user.banned:
                 data = {'error': True, 'message': 'API key is banned or not activated yet'}
             else:

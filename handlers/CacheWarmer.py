@@ -1,14 +1,9 @@
-import json
 import time
 
 import webapp2
 
-from Attendance import Attendance
-from CompleteAttendance import ClassAttendance
-from CompleteAttendance import CompleteAttendance
-from Result import Result
-from db.models import CacheData
 from db.models import User
+from utils import *
 
 
 class CacheWarmer(webapp2.RequestHandler):
@@ -28,18 +23,18 @@ class CacheWarmer(webapp2.RequestHandler):
         for entry in cached.iter():
             request = entry.request
             if 'attendance_' in request:
-                Attendance.get_attendance(CacheWarmer.substring(request, 'attendance_'), user, cache_enabled)
+                get_attendance(CacheWarmer.substring(request, 'attendance_'), user, cache_enabled)
                 data['attendance'] += 1
             elif 'result_' in request:
                 fac, en = request.split(':')
                 fac = CacheWarmer.substring(fac, 'result_')
-                Result.get_result(fac, en, user, cache_enabled)
+                get_result(fac, en, user, cache_enabled)
                 data['result'] += 1
             elif 'course_' in request:
-                ClassAttendance.get_attendance(CacheWarmer.substring(request, 'course_'), user, cache_enabled)
+                get_attendance(CacheWarmer.substring(request, 'course_'), user, cache_enabled)
                 data['course'] += 1
             elif 'complete_' in request:
-                CompleteAttendance.get_attendance(user, cache_enabled)
+                get_attendance(user, cache_enabled)
                 data['complete'] += 1
 
         return data
