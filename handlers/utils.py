@@ -35,7 +35,6 @@ def verify_page(doc):
 
 def fetch_item(url, fetch):
     doc = urlfetch.fetch(url)
-    ''''http://ctengg.amu.ac.in/web/table.php?id=' + fac_no'''
 
     data = verify_page(doc.content)
     if data['error']:
