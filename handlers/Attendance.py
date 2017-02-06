@@ -88,14 +88,14 @@ class Attendance(webapp2.RequestHandler):
         data = {'error':True, 'message':"URL must contain API Key : 'api_key'"}
         if api_key:
             user = User.get_user(api_key)
-            if user and not user.banned : 
+            if user and not user.banned :
                 data = Attendance.get_attendance(fac_no, user)
                 #Attendance.log(fac_no)
             elif user and user.banned :
                 data = {'error':True, 'message':'API key is banned or not activated yet'}
             else :
                 data = {'error':True, 'message':'No such API key in database'}
-        
+
         json_out = json.dumps(data, ensure_ascii=False, indent=2)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json_out)

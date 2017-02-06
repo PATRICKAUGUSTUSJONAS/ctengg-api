@@ -31,14 +31,14 @@ class Result(webapp2.RequestHandler):
         cred_table = table.find('table', {'style':'width:100%;text-align:center;'})
         for row in cred_table.find_all('tr')[1:]:
             dataset= dict(zip(credit_keys, (m.get_text()for m in row.find_all('td'))))
-        
+
         dataset['results'] = list()
         res_table = table.find('table', {'class':"table table-hover"})
-        
+
         for row in res_table.find_all('tr')[1:]:
             x = dict(zip(keys, (m.get_text() for m in row.find_all('td'))))
             dataset['results'].append(x)
-        
+
         return dataset
 
     @staticmethod
@@ -101,7 +101,7 @@ class Result(webapp2.RequestHandler):
         data = {'error':True, 'message':"URL must contain API Key : 'api_key', Faculty Number : 'fac' and Enrolment No : 'en'"}
         if api_key and fac_no and enrol_no:
             user = User.get_user(api_key)
-            if user and not user.banned : 
+            if user and not user.banned :
                 data = Result.get_result(fac_no, enrol_no, user)
                 #Result.log(fac_no, enrol_no)
             elif user and user.banned :

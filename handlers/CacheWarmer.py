@@ -21,7 +21,7 @@ class CacheWarmer(webapp2.RequestHandler):
 		data['result'] = 0
 		data['course'] = 0
 		data['complete'] = 0
-		
+
 		cached = CacheData.query()
 		for entry in cached.iter():
 			request = entry.request
