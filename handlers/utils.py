@@ -2,10 +2,6 @@ import json
 
 from google.appengine.api import memcache
 
-from Attendance import Attendance
-from CompleteAttendance import ClassAttendance
-from CompleteAttendance import CompleteAttendance
-from Result import Result
 from db.models import CacheData
 
 
@@ -23,6 +19,7 @@ def verify_page(doc):
 
 
 def get_complete_attendance(user, use_stored=True):
+    from CompleteAttendance import CompleteAttendance
     key = 'complete_attendance'
     data = memcache.get(key)
 
@@ -43,6 +40,7 @@ def get_complete_attendance(user, use_stored=True):
 
 
 def get_course_attendance(course, user, use_stored=True):
+    from CompleteAttendance import ClassAttendance
     key = 'course_' + course
     data = memcache.get(key)
 
@@ -63,6 +61,7 @@ def get_course_attendance(course, user, use_stored=True):
 
 
 def get_result(fac_no, enrol_no, user, use_stored=True):
+    from Result import Result
     key = 'result_' + fac_no.upper() + ':' + enrol_no.upper()
     data = memcache.get(key)
 
@@ -83,6 +82,7 @@ def get_result(fac_no, enrol_no, user, use_stored=True):
 
 
 def get_attendance(fac_no, user, use_stored=True):
+    from Attendance import Attendance
     key = 'attendance_' + fac_no.upper()
     data = memcache.get(key)
 
