@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 from db.models import User
 from db.models import RequestLog
 from db.models import CacheData
-from google.appengine.ext import db
 from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
@@ -49,7 +48,7 @@ class Result(webapp2.RequestHandler):
             data = Result.parse_result(doc.content)
             data['error'] = False
             data['message'] = 'Successful'
-        except AttributeError as e:
+        except AttributeError:
             data = dict()
             data['error'] = True
             data['message'] = 'Parse Error'

@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 from db.models import User
 from db.models import CacheData
 from xlrd import XLRDError
-from google.appengine.ext import db
 from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
@@ -25,12 +24,12 @@ class ClassAttendance(webapp2.RequestHandler):
         try:
             date_generated = sheet.cell(0, 8).value
             datasets['date_generated'] = datetime.datetime(*xlrd.xldate_as_tuple(date_generated, book.datemode)).strftime("%B %d, %Y")
-        except ValueError as e:
+        except ValueError:
             pass
         try:
             date_upto = sheet.cell(1, 8).value
             datasets['date_upto'] = datetime.datetime(*xlrd.xldate_as_tuple(date_upto, book.datemode)).strftime("%B %d, %Y")
-        except ValueError as e:
+        except ValueError:
             pass
 
         datasets['students'] = list()
@@ -55,7 +54,7 @@ class ClassAttendance(webapp2.RequestHandler):
             data = ClassAttendance.parse_course(doc.content)
             data['error'] = False
             data['message'] = 'Successful'
-        except XLRDError as e:
+        except XLRDError:
             data = dict()
             data['error'] = True
             data['message'] = 'Invalid Course'
@@ -124,7 +123,7 @@ class CompleteAttendance(webapp2.RequestHandler):
             data = CompleteAttendance.parse(doc.content)
             data['error'] = False
             data['message'] = 'Successful'
-        except AttributeError as e:
+        except AttributeError:
             data = dict()
             data['error'] = True
             data['message'] = 'Parse Error'
