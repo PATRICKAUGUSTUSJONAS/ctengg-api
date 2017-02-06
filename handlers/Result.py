@@ -7,8 +7,8 @@ from db.models import CacheData
 from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
-class Result(webapp2.RequestHandler):
 
+class Result(webapp2.RequestHandler):
     @staticmethod
     def parse_result(page):
         table = BeautifulSoup(page, "html.parser")
@@ -23,17 +23,15 @@ class Result(webapp2.RequestHandler):
                 'grades',
                 'subject_rank']
 
-
         credit_keys = ['faculty_number', 'enrolment', 'name', 'ec', 'spi', 'cpi']
         dataset = dict()
 
-
-        cred_table = table.find('table', {'style':'width:100%;text-align:center;'})
+        cred_table = table.find('table', {'style': 'width:100%;text-align:center;'})
         for row in cred_table.find_all('tr')[1:]:
-            dataset= dict(zip(credit_keys, (m.get_text()for m in row.find_all('td'))))
+            dataset = dict(zip(credit_keys, (m.get_text() for m in row.find_all('td'))))
 
         dataset['results'] = list()
-        res_table = table.find('table', {'class':"table table-hover"})
+        res_table = table.find('table', {'class': "table table-hover"})
 
         for row in res_table.find_all('tr')[1:]:
             x = dict(zip(keys, (m.get_text() for m in row.find_all('td'))))
@@ -43,7 +41,8 @@ class Result(webapp2.RequestHandler):
 
     @staticmethod
     def get_result_by_fetch(fac_no, enrol_no):
-        doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/table_resultnew.php?'+'fac='+fac_no+'&en='+enrol_no+'&prog=btech')
+        doc = urlfetch.fetch(
+            'http://ctengg.amu.ac.in/web/table_resultnew.php?' + 'fac=' + fac_no + '&en=' + enrol_no + '&prog=btech')
         try:
             data = Result.parse_result(doc.content)
             data['error'] = False
@@ -56,15 +55,15 @@ class Result(webapp2.RequestHandler):
         return data
 
     @staticmethod
-    def get_result(fac_no, enrol_no, user, use_stored = True):
-        key = 'result_'+fac_no.upper()+':'+enrol_no.upper()
+    def get_result(fac_no, enrol_no, user, use_stored=True):
+        key = 'result_' + fac_no.upper() + ':' + enrol_no.upper()
         data = memcache.get(key)
 
         if data is None or not use_stored:
             store_data = CacheData.get_by_id(key)
             if store_data is None or not use_stored:
                 data = Result.get_result_by_fetch(fac_no, enrol_no)
-                store_data = CacheData(id = key)
+                store_data = CacheData(id=key)
                 store_data.request = key
                 store_data.data = json.dumps(data)
                 store_data.put()
@@ -79,10 +78,10 @@ class Result(webapp2.RequestHandler):
     def log(fac_no, enrol_no):
         fac_no = fac_no.upper()
         enrol_no = enrol_no.upper()
-        key = fac_no+':'+enrol_no
+        key = fac_no + ':' + enrol_no
         request_log = RequestLog.get_by_id(key)
         if request_log is None:
-            request_log = RequestLog(id = key)
+            request_log = RequestLog(id=key)
             request_log.attendance = False
             request_log.requests = request_log.requests + 1
             request_log.data = key
@@ -98,17 +97,18 @@ class Result(webapp2.RequestHandler):
         fac_no = self.request.get('fac')
         enrol_no = self.request.get('en')
 
-        data = {'error':True, 'message':"URL must contain API Key : 'api_key', Faculty Number : 'fac' and Enrolment No : 'en'"}
+        data = {'error': True,
+                'message': "URL must contain API Key : 'api_key', Faculty Number : 'fac' and Enrolment No : 'en'"}
         if api_key and fac_no and enrol_no:
             user = User.get_user(api_key)
-            if user and not user.banned :
+            if user and not user.banned:
                 data = Result.get_result(fac_no, enrol_no, user)
-                #Result.log(fac_no, enrol_no)
-            elif user and user.banned :
-                data = {'error':True, 'message':'API key is banned or not activated yet'}
-            else :
-                data = {'error':True, 'message':'No such API key in database'}
-        
+                # Result.log(fac_no, enrol_no)
+            elif user and user.banned:
+                data = {'error': True, 'message': 'API key is banned or not activated yet'}
+            else:
+                data = {'error': True, 'message': 'No such API key in database'}
+
         json_out = json.dumps(data, ensure_ascii=False, indent=2)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json_out)
