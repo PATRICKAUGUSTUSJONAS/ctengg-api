@@ -1,5 +1,6 @@
-import jinja2
 import os
+
+import jinja2
 import webapp2
 
 template_dir = os.path.join(os.path.split(os.path.dirname(__file__))[0], "template")

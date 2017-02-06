@@ -1,11 +1,12 @@
 import json
+
 import webapp2
 from bs4 import BeautifulSoup
-from db.models import User
-from db.models import RequestLog
-from db.models import CacheData
-from google.appengine.api import urlfetch
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
+
+from db.models import CacheData
+from db.models import User
 
 
 class Attendance(webapp2.RequestHandler):
@@ -66,21 +67,6 @@ class Attendance(webapp2.RequestHandler):
 
         return data
 
-    @staticmethod
-    def log(fac_no):
-        fac_no = fac_no.upper()
-        request_log = RequestLog.get_by_id(fac_no)
-        if request_log is None:
-            request_log = RequestLog(id=fac_no)
-            request_log.attendance = True
-            request_log.requests = request_log.requests + 1
-            request_log.data = fac_no
-            request_log.put()
-        else:
-            request_log.attendance = True
-            request_log.data = fac_no
-            request_log.requests = request_log.requests + 1
-            request_log.put()
 
     def get(self, fac_no):
         api_key = self.request.get("api_key")

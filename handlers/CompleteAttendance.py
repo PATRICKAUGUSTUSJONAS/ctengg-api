@@ -1,13 +1,15 @@
-import xlrd
-import json
-import webapp2
 import datetime
+import json
+
+import webapp2
+import xlrd
 from bs4 import BeautifulSoup
-from db.models import User
-from db.models import CacheData
-from xlrd import XLRDError
-from google.appengine.api import urlfetch
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
+from xlrd import XLRDError
+
+from db.models import CacheData
+from db.models import User
 
 
 class ClassAttendance(webapp2.RequestHandler):

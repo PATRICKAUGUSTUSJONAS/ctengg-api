@@ -1,12 +1,14 @@
-import time
 import json
+import time
+
 import webapp2
+
 from Attendance import Attendance
-from Result import Result
 from CompleteAttendance import ClassAttendance
 from CompleteAttendance import CompleteAttendance
-from db.models import User
+from Result import Result
 from db.models import CacheData
+from db.models import User
 
 
 class CacheWarmer(webapp2.RequestHandler):

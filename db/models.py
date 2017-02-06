@@ -1,5 +1,5 @@
-from google.appengine.ext import ndb
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 
 
 class User(ndb.Model):

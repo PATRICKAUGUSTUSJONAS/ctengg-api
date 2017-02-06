@@ -1,11 +1,13 @@
 import json
+
 import webapp2
 from bs4 import BeautifulSoup
-from db.models import User
-from db.models import RequestLog
-from db.models import CacheData
-from google.appengine.api import urlfetch
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
+
+from db.models import CacheData
+from db.models import RequestLog
+from db.models import User
 
 
 class Result(webapp2.RequestHandler):
