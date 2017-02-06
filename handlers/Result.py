@@ -41,12 +41,16 @@ class Result(webapp2.RequestHandler):
     def get_result_by_fetch(fac_no, enrol_no):
         doc = urlfetch.fetch(
             'http://ctengg.amu.ac.in/web/table_resultnew.php?' + 'fac=' + fac_no + '&en=' + enrol_no + '&prog=btech')
+
+        data = verify_page(doc.content)
+        if data['error']:
+            return data
+
         try:
             data = Result.parse_result(doc.content)
             data['error'] = False
             data['message'] = 'Successful'
         except AttributeError:
-            data = dict()
             data['error'] = True
             data['message'] = 'Parse Error'
 

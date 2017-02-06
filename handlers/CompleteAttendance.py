@@ -102,6 +102,10 @@ class CompleteAttendance(webapp2.RequestHandler):
     def get_attendance_by_fetch():
         doc = urlfetch.fetch('http://ctengg.amu.ac.in/web/cattendance.php?p=btech')
 
+        data = verify_page(doc.content)
+        if data['error']:
+            return data
+
         try:
             data = CompleteAttendance.parse(doc.content)
             data['error'] = False
