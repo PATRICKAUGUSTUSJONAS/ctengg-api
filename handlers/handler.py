@@ -11,12 +11,13 @@ class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
 
-    def render_str(self, template, **params):
+    @staticmethod
+    def render_str(template, **params):
         t = jinja_env.get_template(template)
         return t.render(params)
 
     def render(self, template, **kw):
-        self.write(self.render_str(template, **kw))
+        self.write(Handler.render_str(template, **kw))
 
         # This is the basic handler class that will be inherited to create class like Mainpage
         # This class provide functions such as write render_str and render

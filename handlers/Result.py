@@ -6,7 +6,6 @@ from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
 from db.models import CacheData
-from db.models import RequestLog
 from db.models import User
 
 
@@ -76,24 +75,6 @@ class Result(webapp2.RequestHandler):
 
         return data
 
-    @staticmethod
-    def log(fac_no, enrol_no):
-        fac_no = fac_no.upper()
-        enrol_no = enrol_no.upper()
-        key = fac_no + ':' + enrol_no
-        request_log = RequestLog.get_by_id(key)
-        if request_log is None:
-            request_log = RequestLog(id=key)
-            request_log.attendance = False
-            request_log.requests = request_log.requests + 1
-            request_log.data = key
-            request_log.put()
-        else:
-            request_log.attendance = False
-            request_log.data = key
-            request_log.requests = request_log.requests + 1
-            request_log.put()
-
     def get(self):
         api_key = self.request.get('api_key')
         fac_no = self.request.get('fac')
@@ -105,7 +86,6 @@ class Result(webapp2.RequestHandler):
             user = User.get_user(api_key)
             if user and not user.banned:
                 data = Result.get_result(fac_no, enrol_no, user)
-                # Result.log(fac_no, enrol_no)
             elif user and user.banned:
                 data = {'error': True, 'message': 'API key is banned or not activated yet'}
             else:

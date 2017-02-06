@@ -47,6 +47,7 @@ class CacheWarmer(webapp2.RequestHandler):
     def get(self):
         start = time.time()
         api_key = self.request.get("api_key")
+        data = dict()
         if api_key:
             user = User.get_user(api_key)
             if user and not user.banned:

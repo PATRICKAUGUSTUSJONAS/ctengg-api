@@ -67,7 +67,6 @@ class Attendance(webapp2.RequestHandler):
 
         return data
 
-
     def get(self, fac_no):
         api_key = self.request.get("api_key")
 
