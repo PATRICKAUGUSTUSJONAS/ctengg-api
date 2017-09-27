@@ -23,8 +23,6 @@ from handlers.CacheWarmer import CacheWarmer
 app = webapp2.WSGIApplication([webapp2.Route(r'/', handler=MainPage, name='home'),
                                webapp2.Route(r'/result/btech', handler=Result, name='result'),
                                webapp2.Route(r'/attendance/<fac_no>', handler=Attendance, name='attendance'),
-                               webapp2.Route(r'/complete_attendance', handler=CompleteAttendance,
-                                             name='complete_attendance'),
-                               webapp2.Route(r'/complete_attendance/<course>', handler=ClassAttendance,
-                                             name='complete_attendance'),
+                               webapp2.Route(r'/complete_attendance', handler=CompleteAttendance, name='complete_attendance'),
+                               webapp2.Route(r'/complete_attendance/<course>', handler=ClassAttendance, name='complete_attendance'),
                                webapp2.Route(r'/cache_warmer', handler=CacheWarmer, name='cache_warmer')])

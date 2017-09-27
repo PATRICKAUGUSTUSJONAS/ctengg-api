@@ -20,4 +20,4 @@ Unofficial REST API for ctengg.amu.ac.in
 /complete_attendance/<subject_id>?api_key={auth_key}  
 
 ## Disclaimer
-Project is managed poorly. Caching is very premature and database and memcached are warmed every 20 minutes using a cron job.
+Project is managed poorly. Caching is very premature and database and memcached are warmed every Sunday using a cron job.
